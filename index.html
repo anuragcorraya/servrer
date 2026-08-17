@@ -1,0 +1,936 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>MADDOX MODZ</title>
+
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800;900&family=JetBrains+Mono:wght@500;600;700&display=swap" rel="stylesheet">
+
+  <style>
+    :root {
+      --bg-0: #04060c;
+      --bg-1: #0a0e1a;
+      --card: rgba(20, 28, 48, 0.6);
+      --border: rgba(148, 163, 184, 0.1);
+      --border-strong: rgba(148, 163, 184, 0.25);
+      --text: #f8fafc;
+      --text-2: #94a3b8;
+      --text-3: #64748b;
+      --accent: #6366f1;
+      --grad: linear-gradient(135deg, #6366f1 0%, #8b5cf6 50%, #d946ef 100%);
+      --red: #ef4444;
+      --red-glow: rgba(239, 68, 68, 0.5);
+      --green: #22c55e;
+      --green-glow: rgba(34, 197, 94, 0.5);
+      --violet: #a855f7;
+      --violet-glow: rgba(168, 85, 247, 0.5);
+      --radius: 20px;
+      --radius-sm: 14px;
+      --shadow: 0 15px 40px -15px rgba(0, 0, 0, 0.6);
+    }
+
+    * { box-sizing: border-box; margin: 0; padding: 0; }
+
+    html, body { height: 100%; }
+
+    body {
+      font-family: 'Inter', system-ui, -apple-system, sans-serif;
+      color: var(--text);
+      background: var(--bg-0);
+      background-image:
+        radial-gradient(ellipse 80% 50% at 15% -10%, rgba(99, 102, 241, 0.15), transparent 60%),
+        radial-gradient(ellipse 70% 60% at 90% 10%, rgba(139, 92, 246, 0.1), transparent 60%);
+      background-attachment: fixed;
+      min-height: 100vh;
+      -webkit-font-smoothing: antialiased;
+      overflow-x: hidden;
+    }
+
+    .app {
+      position: relative;
+      z-index: 1;
+      max-width: 1120px;
+      margin: 0 auto;
+      padding: 28px 20px 60px;
+    }
+
+    /* ============ HEADER ============ */
+    .header {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 16px;
+      flex-wrap: wrap;
+      margin-bottom: 28px;
+    }
+
+    .brand {
+      display: flex;
+      align-items: center;
+      gap: 14px;
+    }
+
+    .logo {
+      width: 54px;
+      height: 54px;
+      border-radius: 14px;
+      background: var(--bg-1);
+      border: 1px solid var(--border-strong);
+      display: grid;
+      place-items: center;
+      box-shadow: 0 8px 20px -6px rgba(0, 0, 0, 0.5);
+      position: relative;
+      overflow: hidden;
+    }
+    .logo img {
+      width: 100%;
+      height: 100%;
+      object-fit: cover;
+      border-radius: 14px;
+      position: relative;
+      z-index: 1;
+    }
+
+    .brand h1 {
+      font-size: 22px;
+      font-weight: 800;
+      letter-spacing: -0.02em;
+      background: linear-gradient(180deg, #ffffff, #94a3b8);
+      -webkit-background-clip: text;
+      background-clip: text;
+      -webkit-text-fill-color: transparent;
+    }
+    .brand p {
+      font-size: 11px;
+      color: var(--text-2);
+      margin-top: 2px;
+      font-weight: 600;
+      letter-spacing: 0.06em;
+      text-transform: uppercase;
+    }
+
+    .status-bar {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      padding: 10px 16px;
+      background: var(--card);
+      border: 1px solid var(--border-strong);
+      border-radius: 999px;
+      font-size: 13px;
+      font-weight: 600;
+      transition: all 0.3s ease;
+    }
+    .status-bar.online { border-color: rgba(34, 197, 94, 0.35); box-shadow: 0 0 15px -4px rgba(34, 197, 94, 0.3); }
+    .status-bar.online .status-dot { background: var(--green); animation: pulse 2s infinite; }
+    .status-bar.error { border-color: rgba(239, 68, 68, 0.35); }
+    .status-bar.error .status-dot { background: var(--red); }
+    .status-bar.loading .status-dot { background: var(--accent); animation: pulse 1s infinite; }
+
+    .status-dot {
+      width: 9px;
+      height: 9px;
+      border-radius: 50%;
+      background: var(--text-3);
+    }
+    @keyframes pulse {
+      0% { box-shadow: 0 0 0 0 var(--green-glow); }
+      70% { box-shadow: 0 0 0 8px transparent; }
+      100% { box-shadow: 0 0 0 0 transparent; }
+    }
+
+    /* ============ LATEST CARD ============ */
+    .latest-card {
+      background: var(--card);
+      border: 1px solid var(--border);
+      border-radius: var(--radius);
+      padding: 28px;
+      box-shadow: var(--shadow);
+      margin-bottom: 20px;
+      position: relative;
+      overflow: hidden;
+    }
+
+    .latest-header {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      margin-bottom: 24px;
+    }
+    .latest-header h2 {
+      font-size: 13px;
+      font-weight: 700;
+      color: var(--text-2);
+      text-transform: uppercase;
+      letter-spacing: 0.12em;
+    }
+    .live-badge {
+      display: inline-flex;
+      align-items: center;
+      gap: 6px;
+      font-size: 11px;
+      font-weight: 700;
+      color: var(--red);
+      padding: 4px 10px;
+      background: rgba(239, 68, 68, 0.1);
+      border: 1px solid rgba(239, 68, 68, 0.25);
+      border-radius: 999px;
+    }
+    .live-badge::before {
+      content: "";
+      width: 6px;
+      height: 6px;
+      background: var(--red);
+      border-radius: 50%;
+      animation: pulse 1.5s infinite;
+    }
+
+    .latest-body {
+      display: grid;
+      grid-template-columns: auto 1fr;
+      gap: 32px;
+      align-items: center;
+    }
+
+    .big-ball {
+      width: 140px;
+      height: 140px;
+      border-radius: 50%;
+      display: grid;
+      place-items: center;
+      font-size: 64px;
+      font-weight: 900;
+      font-family: 'JetBrains Mono', monospace;
+      color: white;
+      position: relative;
+      transition: transform 0.3s ease;
+      box-shadow: 0 15px 35px -8px rgba(0,0,0,0.6), inset 0 -8px 20px rgba(0,0,0,0.4), inset 0 8px 20px rgba(255,255,255,0.25);
+    }
+    .big-ball.pop { animation: pop 0.4s ease; }
+    @keyframes pop {
+      0% { transform: scale(0.8); }
+      50% { transform: scale(1.05); }
+      100% { transform: scale(1); }
+    }
+    .big-ball.red { background: radial-gradient(circle at 30% 30%, #ff6b6b, #dc2626 70%, #991b1b); }
+    .big-ball.green { background: radial-gradient(circle at 30% 30%, #4ade80, #16a34a 70%, #15803d); }
+    .big-ball.violet { background: radial-gradient(circle at 30% 30%, #c084fc, #9333ea 70%, #6b21a8); }
+    .big-ball.red-violet { background: conic-gradient(from 180deg, #dc2626 0deg 180deg, #9333ea 180deg 360deg); }
+    .big-ball.green-violet { background: conic-gradient(from 180deg, #16a34a 0deg 180deg, #9333ea 180deg 360deg); }
+    .big-ball.neutral { background: radial-gradient(circle at 30% 30%, #475569, #1e293b 70%, #0f172a); }
+
+    .latest-meta {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 14px;
+    }
+
+    .meta-box {
+      background: rgba(255,255,255,0.03);
+      border: 1px solid var(--border);
+      border-radius: var(--radius-sm);
+      padding: 14px 16px;
+    }
+    .meta-box label {
+      display: block;
+      font-size: 10px;
+      font-weight: 600;
+      color: var(--text-3);
+      text-transform: uppercase;
+      letter-spacing: 0.1em;
+      margin-bottom: 8px;
+    }
+    .meta-box .val {
+      font-size: 15px;
+      font-weight: 700;
+      color: var(--text);
+      font-family: 'JetBrains Mono', monospace;
+      word-break: break-all;
+    }
+
+    .color-pills { display: flex; gap: 6px; flex-wrap: wrap; }
+    .pill {
+      display: inline-flex;
+      align-items: center;
+      gap: 5px;
+      font-size: 11px;
+      font-weight: 700;
+      padding: 4px 9px;
+      border-radius: 999px;
+    }
+    .pill .dot { width: 8px; height: 8px; border-radius: 50%; }
+    .pill.red { background: rgba(239,68,68,0.12); color: #fca5a5; border: 1px solid rgba(239,68,68,0.25); }
+    .pill.red .dot { background: var(--red); }
+    .pill.green { background: rgba(34,197,94,0.12); color: #86efac; border: 1px solid rgba(34,197,94,0.25); }
+    .pill.green .dot { background: var(--green); }
+    .pill.violet { background: rgba(168,85,247,0.12); color: #d8b4fe; border: 1px solid rgba(168,85,247,0.25); }
+    .pill.violet .dot { background: var(--violet); }
+
+    .size-badge {
+      display: inline-flex;
+      align-items: center;
+      font-size: 11px;
+      font-weight: 700;
+      padding: 4px 9px;
+      border-radius: 999px;
+    }
+    .size-badge.big { background: rgba(245,158,11,0.15); color: #fcd34d; border: 1px solid rgba(245,158,11,0.3); }
+    .size-badge.small { background: rgba(34,197,94,0.12); color: #86efac; border: 1px solid rgba(34,197,94,0.25); }
+
+    /* ============ STATS ============ */
+    .stats {
+      display: grid;
+      grid-template-columns: repeat(6, 1fr);
+      gap: 12px;
+      margin-bottom: 20px;
+    }
+    .stat {
+      background: var(--card);
+      border: 1px solid var(--border);
+      border-radius: var(--radius-sm);
+      padding: 14px;
+      transition: all 0.2s ease;
+    }
+    .stat:hover { transform: translateY(-2px); border-color: var(--border-strong); }
+    .stat label {
+      font-size: 10px;
+      font-weight: 700;
+      text-transform: uppercase;
+      letter-spacing: 0.1em;
+      color: var(--text-3);
+      display: flex;
+      align-items: center;
+      gap: 6px;
+      margin-bottom: 6px;
+    }
+    .stat label .d { width: 8px; height: 8px; border-radius: 50%; }
+    .stat .num { font-size: 24px; font-weight: 800; font-family: 'JetBrains Mono', monospace; }
+    .stat.s-red label .d { background: var(--red); }
+    .stat.s-green label .d { background: var(--green); }
+    .stat.s-violet label .d { background: var(--violet); }
+    .stat.s-big label .d { background: #f59e0b; }
+    .stat.s-small label .d { background: #22c55e; }
+    .stat.s-total label .d { background: var(--accent); }
+    .stat.s-total .num { background: var(--grad); -webkit-background-clip: text; background-clip: text; -webkit-text-fill-color: transparent; }
+
+    /* ============ HISTORY CARD ============ */
+    .history-card {
+      background: var(--card);
+      border: 1px solid var(--border);
+      border-radius: var(--radius);
+      box-shadow: var(--shadow);
+      overflow: hidden;
+    }
+    .history-head {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 12px;
+      flex-wrap: wrap;
+      padding: 20px 22px;
+      border-bottom: 1px solid var(--border);
+    }
+    .history-head h2 { font-size: 16px; font-weight: 700; display: flex; align-items: center; gap: 8px; }
+    .history-head h2 .count {
+      font-size: 11px;
+      color: var(--text-2);
+      background: rgba(255,255,255,0.05);
+      padding: 3px 8px;
+      border-radius: 999px;
+      border: 1px solid var(--border);
+      font-family: 'JetBrains Mono', monospace;
+    }
+
+    .controls { display: flex; gap: 8px; flex-wrap: wrap; }
+    .filter-btn {
+      padding: 7px 13px;
+      background: rgba(255,255,255,0.03);
+      border: 1px solid var(--border);
+      border-radius: 999px;
+      color: var(--text-2);
+      font-size: 12px;
+      font-weight: 600;
+      cursor: pointer;
+      transition: all 0.2s;
+      display: inline-flex;
+      align-items: center;
+      gap: 6px;
+    }
+    .filter-btn:hover { color: var(--text); border-color: var(--border-strong); }
+    .filter-btn.active { background: var(--accent); border-color: var(--accent); color: white; }
+    .filter-btn .d { width: 8px; height: 8px; border-radius: 50%; }
+    .filter-btn[data-f="red"] .d { background: var(--red); }
+    .filter-btn[data-f="green"] .d { background: var(--green); }
+    .filter-btn[data-f="violet"] .d { background: var(--violet); }
+
+    .table-wrap { overflow-x: auto; max-height: 600px; overflow-y: auto; }
+    .table-wrap::-webkit-scrollbar { width: 6px; height: 6px; }
+    .table-wrap::-webkit-scrollbar-thumb { background: rgba(148,163,184,0.15); border-radius: 3px; }
+
+    table { width: 100%; border-collapse: collapse; min-width: 720px; }
+    thead th {
+      position: sticky;
+      top: 0;
+      background: rgba(10, 14, 26, 0.98);
+      padding: 14px 16px;
+      font-size: 11px;
+      font-weight: 700;
+      text-transform: uppercase;
+      letter-spacing: 0.08em;
+      color: var(--text-3);
+      text-align: center;
+      border-bottom: 1px solid var(--border);
+      z-index: 2;
+    }
+    thead th:first-child { text-align: left; }
+    tbody td {
+      padding: 12px 16px;
+      font-size: 13px;
+      text-align: center;
+      border-bottom: 1px solid rgba(148,163,184,0.05);
+    }
+    tbody tr:hover td { background: rgba(99, 102, 241, 0.03); }
+    tbody td.issue {
+      text-align: left;
+      font-family: 'JetBrains Mono', monospace;
+      font-weight: 600;
+      color: var(--text);
+      font-size: 12.5px;
+    }
+
+    .ball {
+      width: 36px;
+      height: 36px;
+      border-radius: 50%;
+      display: inline-grid;
+      place-items: center;
+      font-size: 16px;
+      font-weight: 800;
+      color: white;
+      font-family: 'JetBrains Mono', monospace;
+      box-shadow: 0 4px 10px -2px rgba(0,0,0,0.4), inset 0 -3px 8px rgba(0,0,0,0.3), inset 0 3px 8px rgba(255,255,255,0.3);
+      transition: transform 0.15s;
+    }
+    .ball:hover { transform: scale(1.1); }
+    .ball.red { background: radial-gradient(circle at 30% 30%, #ff6b6b, #dc2626 70%, #991b1b); }
+    .ball.green { background: radial-gradient(circle at 30% 30%, #4ade80, #16a34a 70%, #15803d); }
+    .ball.violet { background: radial-gradient(circle at 30% 30%, #c084fc, #9333ea 70%, #6b21a8); }
+    .ball.red-violet { background: conic-gradient(from 180deg, #dc2626 0deg 180deg, #9333ea 180deg 360deg); }
+    .ball.green-violet { background: conic-gradient(from 180deg, #16a34a 0deg 180deg, #9333ea 180deg 360deg); }
+    .ball.neutral { background: radial-gradient(circle at 30% 30%, #475569, #1e293b 70%, #0f172a); }
+
+    .empty-row td { padding: 60px 20px !important; color: var(--text-3); font-size: 13px; }
+    .empty-row .spinner {
+      width: 28px; height: 28px;
+      border: 2.5px solid rgba(99,102,241,0.2);
+      border-top-color: var(--accent);
+      border-radius: 50%;
+      margin: 0 auto 12px;
+      animation: spin 0.8s linear infinite;
+    }
+    @keyframes spin { to { transform: rotate(360deg); } }
+
+    /* ============ TOAST ============ */
+    .toast {
+      position: fixed;
+      bottom: 24px;
+      left: 50%;
+      transform: translateX(-50%) translateY(100px);
+      background: rgba(10, 14, 26, 0.98);
+      border: 1px solid var(--border-strong);
+      color: var(--text);
+      padding: 12px 20px;
+      border-radius: 999px;
+      font-size: 13px;
+      font-weight: 500;
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      box-shadow: 0 15px 30px -10px rgba(0,0,0,0.6);
+      opacity: 0;
+      transition: all 0.3s cubic-bezier(0.34, 1.56, 0.64, 1);
+      z-index: 100;
+    }
+    .toast.show { transform: translateX(-50%) translateY(0); opacity: 1; }
+    .toast .icon { width: 20px; height: 20px; border-radius: 50%; display: grid; place-items: center; }
+    .toast.success .icon { background: rgba(34,197,94,0.2); color: var(--green); }
+    .toast.error .icon { background: rgba(239,68,68,0.2); color: var(--red); }
+    .toast.info .icon { background: rgba(99,102,241,0.2); color: var(--accent); }
+
+    @media (max-width: 760px) {
+      .latest-body { grid-template-columns: 1fr; text-align: center; gap: 22px; }
+      .big-ball { margin: 0 auto; width: 120px; height: 120px; font-size: 52px; }
+      .latest-meta { grid-template-columns: 1fr 1fr; }
+      .stats { grid-template-columns: repeat(3, 1fr); }
+    }
+    @media (max-width: 480px) {
+      .stats { grid-template-columns: repeat(2, 1fr); }
+    }
+  </style>
+</head>
+<body>
+
+  <div class="app">
+
+    <header class="header">
+      <div class="brand">
+        <div class="logo">
+          <img src="https://i.ibb.co.com/mgjtz8t/logo-1.png" alt="MADDOX MODZ Logo">
+        </div>
+        <div>
+          <h1>MADDOX MODZ</h1>
+          <p>Wingo Results • 30s</p>
+        </div>
+      </div>
+      <div id="statusBar" class="status-bar loading">
+        <span class="status-dot"></span>
+        <span id="statusText">Connecting…</span>
+      </div>
+    </header>
+
+    <section class="latest-card">
+      <div class="latest-header">
+        <h2>Latest Result</h2>
+        <span class="live-badge">LIVE</span>
+      </div>
+      <div class="latest-body">
+        <div id="bigBall" class="big-ball neutral">-</div>
+        <div class="latest-meta">
+          <div class="meta-box">
+            <label>Issue / Round</label>
+            <div id="latestIssue" class="val mono-sm">—</div>
+          </div>
+          <div class="meta-box">
+            <label>Color</label>
+            <div id="latestColors" class="color-pills" style="margin-top:4px">
+              <span class="pill"><span class="dot" style="background:var(--text-3)"></span>—</span>
+            </div>
+          </div>
+          <div class="meta-box">
+            <label>Size</label>
+            <div id="latestSize" style="margin-top:4px">
+              <span class="size-badge">—</span>
+            </div>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <section class="stats">
+      <div class="stat s-total">
+        <label><span class="d"></span>Total</label>
+        <div class="num" id="statTotal">0</div>
+      </div>
+      <div class="stat s-red">
+        <label><span class="d"></span>Red</label>
+        <div class="num" id="statRed">0</div>
+      </div>
+      <div class="stat s-green">
+        <label><span class="d"></span>Green</label>
+        <div class="num" id="statGreen">0</div>
+      </div>
+      <div class="stat s-violet">
+        <label><span class="d"></span>Violet</label>
+        <div class="num" id="statViolet">0</div>
+      </div>
+      <div class="stat s-big">
+        <label><span class="d"></span>Big</label>
+        <div class="num" id="statBig">0</div>
+      </div>
+      <div class="stat s-small">
+        <label><span class="d"></span>Small</label>
+        <div class="num" id="statSmall">0</div>
+      </div>
+    </section>
+
+    <section class="history-card">
+      <div class="history-head">
+        <h2>Result History <span class="count" id="rowCount">0</span></h2>
+        <div class="controls">
+          <button class="filter-btn active" data-f="all">All</button>
+          <button class="filter-btn" data-f="red"><span class="d"></span>Red</button>
+          <button class="filter-btn" data-f="green"><span class="d"></span>Green</button>
+          <button class="filter-btn" data-f="violet"><span class="d"></span>Violet</button>
+          <button class="filter-btn" data-f="big">Big</button>
+          <button class="filter-btn" data-f="small">Small</button>
+        </div>
+      </div>
+      <div class="table-wrap">
+        <table>
+          <thead>
+            <tr>
+              <th>Issue</th>
+              <th>Number</th>
+              <th>Color</th>
+              <th>Size</th>
+            </tr>
+          </thead>
+          <tbody id="historyBody">
+            <tr class="empty-row">
+              <td colspan="4">
+                <div class="spinner"></div>
+                Loading real-time data…
+              </td>
+            </tr>
+          </tbody>
+        </table>
+      </div>
+    </section>
+
+  </div>
+
+  <div id="toast" class="toast">
+    <div class="icon">
+      <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round" stroke-linejoin="round">
+        <polyline points="20 6 9 17 4 12"/>
+      </svg>
+    </div>
+    <span id="toastMsg">Ready</span>
+  </div>
+
+  <script type="module">
+    import { initializeApp } from "https://www.gstatic.com/firebasejs/12.1.0/firebase-app.js";
+    import {
+      getFirestore,
+      collection,
+      doc,
+      getDoc,
+      setDoc,
+      query,
+      orderBy,
+      limit,
+      onSnapshot,
+      serverTimestamp
+    } from "https://www.gstatic.com/firebasejs/12.1.0/firebase-firestore.js";
+
+    const firebaseConfig = {
+      apiKey: "AIzaSyB8BfSkcBtHrg7BTNn45jsP50Qq9uGb6_w",
+      authDomain: "appp-42a6a.firebaseapp.com",
+      databaseURL: "https://appp-42a6a-default-rtdb.firebaseio.com",
+      projectId: "appp-42a6a",
+      storageBucket: "appp-42a6a.firebasestorage.app",
+      messagingSenderId: "872001684356",
+      appId: "1:872001684356:web:4c18d2296a149c771613d1"
+    };
+
+    const app = initializeApp(firebaseConfig);
+    const db = getFirestore(app);
+
+    const API_URL = "https://draw.ar-lottery01.com/WinGo/WinGo_30S/GetHistoryIssuePage.json";
+
+    const elements = {
+      statusBar: document.getElementById("statusBar"),
+      statusText: document.getElementById("statusText"),
+      historyBody: document.getElementById("historyBody"),
+      bigBall: document.getElementById("bigBall"),
+      latestIssue: document.getElementById("latestIssue"),
+      latestColors: document.getElementById("latestColors"),
+      latestSize: document.getElementById("latestSize"),
+      rowCount: document.getElementById("rowCount"),
+      statTotal: document.getElementById("statTotal"),
+      statRed: document.getElementById("statRed"),
+      statGreen: document.getElementById("statGreen"),
+      statViolet: document.getElementById("statViolet"),
+      statBig: document.getElementById("statBig"),
+      statSmall: document.getElementById("statSmall"),
+      toastEl: document.getElementById("toast"),
+      toastMsg: document.getElementById("toastMsg")
+    };
+
+    let allResults = [];
+    let currentFilter = "all";
+    let knownIssueSet = new Set();
+    let lastLatestIssue = null;
+
+    function setStatus(text, type = "loading") {
+      elements.statusText.textContent = text;
+      elements.statusBar.className = "status-bar " + type;
+    }
+
+    let toastTimer;
+    function toast(message, type = "info") {
+      elements.toastMsg.textContent = message;
+      elements.toastEl.className = "toast show " + type;
+      clearTimeout(toastTimer);
+      toastTimer = setTimeout(() => elements.toastEl.classList.remove("show"), 3000);
+    }
+
+    function escapeHTML(value) {
+      return String(value).replace(/&/g, "&amp;").replace(/</g, "&lt;").replace(/>/g, "&gt;").replace(/"/g, "&quot;").replace(/'/g, "&#039;");
+    }
+
+    function getColorSet(numberStr) {
+      const n = parseInt(numberStr, 10);
+      if (isNaN(n)) return [];
+      if (n === 0) return ["red", "violet"];
+      if (n === 5) return ["green", "violet"];
+      if (n % 2 === 0) return ["red"];
+      return ["green"];
+    }
+
+    function getBallClass(numberStr) {
+      const n = parseInt(numberStr, 10);
+      if (isNaN(n)) return "neutral";
+      if (n === 0) return "red-violet";
+      if (n === 5) return "green-violet";
+      if (n % 2 === 0) return "red";
+      return "green";
+    }
+
+    function getSize(numberStr) {
+      const n = parseInt(numberStr, 10);
+      if (isNaN(n)) return "—";
+      return n >= 5 ? "Big" : "Small";
+    }
+
+    async function getApiData() {
+      const response = await fetch(API_URL, { method: "GET", cache: "no-store" });
+      if (!response.ok) throw new Error("API HTTP " + response.status);
+      return await response.json();
+    }
+
+    function findResultArray(data) {
+      if (!data) return [];
+      if (Array.isArray(data)) return data;
+      if (data.data && Array.isArray(data.data)) return data.data;
+      if (data.data && Array.isArray(data.data.list)) return data.data.list;
+      if (data.result && Array.isArray(data.result)) return data.result;
+      if (data.result && Array.isArray(data.result.list)) return data.result.list;
+      return [];
+    }
+
+    function normalizeResult(item) {
+      if (!item || typeof item !== "object") return null;
+      const issue  = item.issueNumber ?? item.issue ?? item.issueNo ?? item.period ?? item.roundId ?? item.round ?? item.id;
+      const number = item.number ?? item.result ?? item.resultNumber ?? item.openNumber ?? item.code;
+      if (issue === undefined || issue === null) return null;
+      return {
+        issue: String(issue),
+        number: (number !== undefined && number !== null) ? String(number) : ""
+      };
+    }
+
+    async function saveResult(result) {
+      if (!result || !result.issue) return false;
+      const safeId = String(result.issue).replace(/[\/\\.#$[\]]/g, "_");
+      const resultRef = doc(db, "wingo_results", safeId);
+      const existing = await getDoc(resultRef);
+      if (existing.exists()) return false;
+      await setDoc(resultRef, {
+        issueNumber: result.issue,
+        number: result.number,
+        source: "WinGo API",
+        apiUrl: API_URL,
+        savedAt: serverTimestamp()
+      });
+      return true;
+    }
+
+    function startRealtimeListener() {
+      // ল্যাগ ফ্রি পারফরম্যান্সের জন্য লিমিট ১০০০ করে দেওয়া হয়েছে। এতে ব্রাউজার হ্যাং করবে না।
+      const q = query(
+        collection(db, "wingo_results"),
+        orderBy("savedAt", "desc"),
+        limit(1000) 
+      );
+
+      onSnapshot(q,
+        (snapshot) => {
+          allResults = [];
+          snapshot.forEach((document) => {
+            allResults.push(document.data());
+          });
+
+          knownIssueSet = new Set(allResults.map(r => String(r.issueNumber)));
+
+          renderStats();
+          renderHistory();
+          renderLatest();
+
+          const lastCount = snapshot.size;
+          elements.rowCount.textContent = lastCount;
+
+          if (lastCount === 0) {
+            setStatus("Online • Waiting for data", "online");
+          } else {
+            setStatus(`Online • ${lastCount} results live`, "online");
+          }
+        },
+        (err) => {
+          console.error("Firestore listener error:", err);
+          setStatus("Realtime error", "error");
+          toast("Realtime connection error", "error");
+        }
+      );
+    }
+
+    function renderLatest() {
+      if (!allResults.length) {
+        elements.bigBall.textContent = "—";
+        elements.bigBall.className = "big-ball neutral";
+        elements.latestIssue.textContent = "—";
+        elements.latestColors.innerHTML = '<span class="pill"><span class="dot" style="background:var(--text-3)"></span>—</span>';
+        elements.latestSize.innerHTML = '<span class="size-badge">—</span>';
+        return;
+      }
+
+      const latest = allResults[0];
+      const num = latest.number;
+      const ballClass = getBallClass(num);
+      const colors = getColorSet(num);
+      const size = getSize(num);
+
+      elements.bigBall.textContent = num !== "" && num !== undefined && num !== null ? num : "—";
+      elements.bigBall.className = "big-ball " + ballClass;
+
+      if (lastLatestIssue !== latest.issueNumber) {
+        elements.bigBall.classList.remove("pop");
+        void elements.bigBall.offsetWidth;
+        elements.bigBall.classList.add("pop");
+        lastLatestIssue = latest.issueNumber;
+      }
+
+      elements.latestIssue.textContent = latest.issueNumber || "—";
+
+      elements.latestColors.innerHTML = colors.length
+        ? colors.map(c => `<span class="pill ${c}"><span class="dot"></span>${c}</span>`).join("")
+        : '<span class="pill"><span class="dot" style="background:var(--text-3)"></span>—</span>';
+
+      elements.latestSize.innerHTML = size !== "—"
+        ? `<span class="size-badge ${size.toLowerCase()}">${size}</span>`
+        : '<span class="size-badge">—</span>';
+    }
+
+    function renderStats() {
+      let red = 0, green = 0, violet = 0, big = 0, small = 0;
+      allResults.forEach(r => {
+        const n = parseInt(r.number, 10);
+        if (isNaN(n)) return;
+        const colors = getColorSet(r.number);
+        if (colors.includes("red")) red++;
+        if (colors.includes("green")) green++;
+        if (colors.includes("violet")) violet++;
+        if (n >= 5) big++; else small++;
+      });
+      elements.statTotal.textContent  = allResults.length;
+      elements.statRed.textContent    = red;
+      elements.statGreen.textContent  = green;
+      elements.statViolet.textContent = violet;
+      elements.statBig.textContent    = big;
+      elements.statSmall.textContent  = small;
+    }
+
+    function renderHistory() {
+      if (!allResults.length) {
+        elements.historyBody.innerHTML = `<tr class="empty-row"><td colspan="4"><div style="font-size:28px;opacity:0.4;margin-bottom:8px">○</div>No results yet. Waiting for first API fetch…</td></tr>`;
+        return;
+      }
+
+      const filtered = allResults.filter(r => {
+        if (currentFilter === "all") return true;
+        const n = parseInt(r.number, 10);
+        if (isNaN(n)) return false;
+        const colors = getColorSet(r.number);
+        if (currentFilter === "big")   return n >= 5;
+        if (currentFilter === "small") return n < 5;
+        return colors.includes(currentFilter);
+      });
+
+      if (!filtered.length) {
+        elements.historyBody.innerHTML = `<tr class="empty-row"><td colspan="4">No results match this filter.</td></tr>`;
+        return;
+      }
+
+      let html = "";
+      for (let i = 0; i < filtered.length; i++) {
+        const r = filtered[i];
+        const num = r.number;
+        const ballClass = getBallClass(num);
+        const colors = getColorSet(num);
+        const size = getSize(num);
+        const displayNum = (num !== "" && num !== undefined && num !== null) ? num : "—";
+
+        const colorPills = colors.length
+          ? colors.map(c => `<span class="pill ${c}"><span class="dot"></span>${c}</span>`).join("")
+          : '<span class="pill"><span class="dot" style="background:var(--text-3)"></span>—</span>';
+
+        const sizeBadge = size !== "—"
+          ? `<span class="size-badge ${size.toLowerCase()}">${size}</span>`
+          : '<span class="size-badge">—</span>';
+
+        html += `<tr>
+          <td class="issue">${escapeHTML(r.issueNumber || "—")}</td>
+          <td><span class="ball ${ballClass}">${escapeHTML(displayNum)}</span></td>
+          <td><div class="color-pills" style="justify-content:center">${colorPills}</div></td>
+          <td>${sizeBadge}</td>
+        </tr>`;
+      }
+      elements.historyBody.innerHTML = html;
+    }
+
+    document.querySelectorAll(".filter-btn").forEach(btn => {
+      btn.addEventListener("click", () => {
+        document.querySelectorAll(".filter-btn").forEach(b => b.classList.remove("active"));
+        btn.classList.add("active");
+        currentFilter = btn.dataset.f;
+        renderHistory();
+      });
+    });
+
+    async function updateResults() {
+      try {
+        setStatus("LIVE", "loading");
+        const apiData = await getApiData();
+        const rawResults = findResultArray(apiData);
+
+        if (!rawResults.length) throw new Error("API returned no results");
+
+        let savedCount = 0;
+        let skippedCount = 0;
+
+        for (const item of rawResults) {
+          const result = normalizeResult(item);
+          if (!result) continue;
+
+          if (knownIssueSet.has(result.issue)) {
+            skippedCount++;
+            continue;
+          }
+
+          try {
+            const saved = await saveResult(result);
+            if (saved) {
+              savedCount++;
+              knownIssueSet.add(result.issue);
+            } else {
+              skippedCount++;
+            }
+          } catch (e) {
+            console.error("Save failed for", result.issue, e);
+          }
+        }
+
+        if (savedCount > 0) {
+          toast(`${savedCount} new result${savedCount > 1 ? "s" : ""} saved`, "success");
+        } else {
+          toast("All results up to date", "info");
+        }
+      } catch (error) {
+        console.error(error);
+        setStatus("API error: " + error.message, "error");
+        toast(error.message, "error");
+      }
+    }
+
+    startRealtimeListener();
+    updateResults();
+    setInterval(updateResults, 30000);
+
+    toast("Real-time connection started", "success");
+  </script>
+
+</body>
+</html>
