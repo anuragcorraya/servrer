@@ -1,32 +1,27 @@
 const express = require('express');
 const axios = require('axios');
-const path = require('path');
 
 const app = express();
 const PORT = process.env.PORT || 3000;
 
-// ==================== ফায়ারবেস ও Wingo API কনফিগারেশন ====================
 const FIREBASE_PROJECT_ID = "appp-42a6a";
 const FIREBASE_API_KEY = "AIzaSyB8BfSkcBtHrg7BTNn45jsP50Qq9uGb6_w";
-const WINGO_API_URL = "https://draw.ar-lottery01.com/WinGo/WinGo_30S/GetHistoryIssuePage.json";
+const WINGO_API_BASE = "https://draw.ar-lottery01.com/WinGo/WinGo_30S/GetHistoryIssuePage.json";
 
-// মেমোরি স্টেট ও ক্যাশ
 const savedIssuesSet = new Set();
 const systemLogs = [];
 let totalSavedCount = 0;
 let lastCheckTime = null;
 let lastStatus = "Initializing...";
 
-// লগ যোগ করার ফাংশন
 function addLog(message, type = "INFO") {
   const timestamp = new Date().toLocaleString("en-US", { timeZone: "Asia/Dhaka" });
   const logEntry = `[${timestamp}] [${type}] ${message}`;
   systemLogs.unshift(logEntry);
-  if (systemLogs.length > 50) systemLogs.pop();
+  if (systemLogs.length > 60) systemLogs.pop();
   console.log(logEntry);
 }
 
-// API রেসপন্স থেকে অ্যারাই খুঁজে বের করার লজিক
 function findResultArray(data) {
   if (!data) return [];
   if (Array.isArray(data)) return data;
@@ -38,7 +33,6 @@ function findResultArray(data) {
   return [];
 }
 
-// রেজাল্ট অবজেক্ট ফরম্যাট ক্লিয়ার করার লজিক
 function normalizeResult(item) {
   if (!item || typeof item !== "object") return null;
   const issue = item.issueNumber ?? item.issue ?? item.issueNo ?? item.period ?? item.roundId ?? item.round ?? item.id;
@@ -50,7 +44,6 @@ function normalizeResult(item) {
   };
 }
 
-// Firebase Firestore REST API দিয়ে সরাসরি ফায়ারবেসে ডাটা সেভ করার ফাংশন
 async function saveToFirestore(result) {
   const safeId = String(result.issue).replace(/[\/\\.#$[\]]/g, "_");
   const firestoreUrl = `https://firestore.googleapis.com/v1/projects/${FIREBASE_PROJECT_ID}/databases/(default)/documents/wingo_results/${safeId}?key=${FIREBASE_API_KEY}`;
@@ -59,8 +52,8 @@ async function saveToFirestore(result) {
     fields: {
       issueNumber: { stringValue: String(result.issue) },
       number: { stringValue: String(result.number) },
-      source: { stringValue: "Render Backend Automation" },
-      apiUrl: { stringValue: WINGO_API_URL },
+      source: { stringValue: "Render Backend Engine" },
+      apiUrl: { stringValue: WINGO_API_BASE },
       savedAt: { timestampValue: new Date().toISOString() }
     }
   };
@@ -77,15 +70,25 @@ async function saveToFirestore(result) {
   }
 }
 
-// ==================== মূল অটোমেশন ইঞ্জিন (প্রতি ১০ সেকেন্ড পর পর চলবে) ====================
 async function fetchAndSyncWingo() {
   lastCheckTime = new Date().toLocaleString("en-US", { timeZone: "Asia/Dhaka" });
+  
+  // Adding a unique timestamp query parameter to bypass Cloudflare / 403 blocks
+  const dynamicUrl = `${WINGO_API_BASE}?_=${Date.now()}`;
+
   try {
-    const response = await axios.get(WINGO_API_URL, {
+    const response = await axios.get(dynamicUrl, {
       headers: {
-        'User-Agent': 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36',
+        'User-Agent': 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/124.0.0.0 Safari/537.36',
         'Accept': 'application/json, text/plain, */*',
-        'Cache-Control': 'no-cache'
+        'Accept-Language': 'en-US,en;q=0.9',
+        'Cache-Control': 'no-cache',
+        'Pragma': 'no-cache',
+        'Referer': 'https://draw.ar-lottery01.com/',
+        'Origin': 'https://draw.ar-lottery01.com',
+        'Sec-Ch-Ua': '"Chromium";v="124", "Google Chrome";v="124", "Not-A.Brand";v="99"',
+        'Sec-Ch-Ua-Mobile': '?0',
+        'Sec-Ch-Ua-Platform': '"Windows"'
       },
       timeout: 10000
     });
@@ -103,10 +106,8 @@ async function fetchAndSyncWingo() {
       const parsed = normalizeResult(item);
       if (!parsed || !parsed.issue) continue;
 
-      // মেমোরি ফিল্টার
       if (savedIssuesSet.has(parsed.issue)) continue;
 
-      // ফায়ারবেসে পুশ
       const isSaved = await saveToFirestore(parsed);
       if (isSaved) {
         savedIssuesSet.add(parsed.issue);
@@ -127,14 +128,11 @@ async function fetchAndSyncWingo() {
   }
 }
 
-// সার্ভার চালু হওয়ার পরপরই প্রতি ১০ সেকেন্ড পর পর স্বয়ংক্রিয়ভাবে Wingo চেক করবে
-setInterval(fetchAndSyncWingo, 10000); // 10 Seconds check ensures zero data loss
-fetchAndSyncWingo(); // First run immediately
+setInterval(fetchAndSyncWingo, 10000); // Checks every 10 seconds to avoid missing any 30s draw
+fetchAndSyncWingo();
 
-// ==================== Express Server & Status Monitor UI ====================
 app.use(express.json());
 
-// API Status Route
 app.get('/api/status', (req, res) => {
   res.json({
     status: lastStatus,
@@ -145,12 +143,10 @@ app.get('/api/status', (req, res) => {
   });
 });
 
-// Ping endpoint for UptimeRobot
 app.get('/ping', (req, res) => {
   res.send('PONG - Wingo 30s Backend is Live!');
 });
 
-// Admin Dashboard UI
 app.get('/', (req, res) => {
   res.send(`
     <!DOCTYPE html>
@@ -158,7 +154,7 @@ app.get('/', (req, res) => {
     <head>
       <meta charset="UTF-8">
       <meta name="viewport" content="width=device-width, initial-scale=1.0">
-      <title>Wingo 30s Backend Engine Status</title>
+      <title>MADDOX MODZ - Wingo 30s Backend Engine</title>
       <style>
         body { font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif; background: #0b0f19; color: #e2e8f0; margin: 0; padding: 20px; }
         .container { max-width: 900px; margin: 0 auto; background: #151d30; padding: 25px; border-radius: 12px; border: 1px solid rgba(255,255,255,0.1); }
@@ -203,13 +199,7 @@ app.get('/', (req, res) => {
         </div>
       </div>
       <script>
-        setInterval(() => {
-          fetch('/api/status')
-            .then(res => res.json())
-            .then(data => {
-              location.reload();
-            });
-        }, 8000);
+        setTimeout(() => { location.reload(); }, 8000);
       </script>
     </body>
     </html>
